@@ -1,46 +1,27 @@
-# ideonomy-skill
+# ideonomy
 
-A Claude Code skill for expanding ideas using **ideonomy** — Patrick Gunkel's "science of ideas," as synthesized in [Grace Kind's essays at gracekind.net](https://gracekind.net/writing/ideonomy/intro).
+> *Ideas are natural phenomena. They have properties. They live along dimensions. They can be sliced, negated, recombined, and re-instantiated like any other natural object.*
+> — after Patrick Gunkel, via Grace Kind
 
-The skill teaches an agent to slice, negate, recombine, and re-instantiate any idea using ideonomic operators (negation, substitution, combination, abstraction, etc.) applied to identified dimensions of the idea, captured as structured artifacts called *organons* (lists, charts, scales, atlases, dictionaries, trees).
+A Claude Code skill that turns any idea into a populated neighborhood of related ideas, by applying combinations of *ideonomic operators* — negate, substitute, combine, abstract, re-instantiate, find-the-tree — drawn from a randomized tuple at every invocation.
 
-A small `bin/pick` shell script selects a random combination of operators, organons, dimension-prompts, and recipes on each invocation, so the agent doesn't fall into the same default brainstorming moves every time. The combinatorial space runs into the millions of distinct method tuples.
+Every call picks a different combination of operators, organons, and dimensional prompts from a catalog of millions of distinct method-tuples. The agent doesn't get to fall back on its default brainstorming moves. That's the whole point.
 
-## Install
+---
 
-```bash
-# Clone wherever you keep code
-git clone https://github.com/<you>/ideonomy-skill ~/Code/ideonomy-skill
-
-# Symlink into your personal skills directory
-ln -s ~/Code/ideonomy-skill ~/.claude/skills/ideonomy
-```
-
-After install, the skill is discoverable as `ideonomy` and invokable via the `Skill` tool.
-
-To use it from a different agent harness, point the harness at the repo's `SKILL.md`. The pick script is at `bin/pick`; everything is plain bash + standard tools (`awk`, `sort`, `curl` for the optional `--random-org` flag).
-
-## What's in the catalog
-
-| Path | Count | What it is |
-|---|---|---|
-| `methods/operators/` | 8 | Ideonomic operations from Grace's essays — negation, substitution, combination, organon-construction, dimension-identification, tree-finding, abstraction-lift, cross-domain re-instantiation. |
-| `methods/organons/` | 7 | Structured-artifact types Grace names in her intro — list, chart, graph, atlas, scale, dictionary, tree. |
-| `methods/dimension-prompts/` | 25 | Question templates that surface dimensions of an arbitrary idea. Grace describes the method; this catalog provides ready-to-pick prompts. |
-| `methods/recipes/` | 8 | Pre-composed multi-step workflows — negation cascade, cross-domain lift, atlas of perspectives, etc. |
-
-## Try it
+## Try the rite
 
 ```bash
-$ bin/pick
+$ ~/.claude/skills/ideonomy/bin/pick
+
 === IDEONOMY METHOD TUPLE (this invocation) ===
 
 OPERATORS:
   - abstraction-lift
-  - substitution
+  - cross-domain-reinstantiation
 
 ORGANONS:
-  - scale
+  - periodic-grid
 
 DIMENSION-PROMPTS:
   - longevity
@@ -52,22 +33,85 @@ RECIPE:
 
 ==============================================
 
------ /…/operators/abstraction-lift.md -----
-[body of abstraction-lift]
-…
+[…bodies of each picked method file follow, ready for the agent to apply…]
 ```
 
-The agent reads everything that follows the header and applies the operators (in order) to the user's idea, using the picked organon as the output form.
+Then ask Claude to apply the tuple to your idea. What you'll get back: five or ten unfamiliar variants of the idea, organized into the picked organon, with the picked operators visible in how the agent got there. Sometimes the result is brilliant. Sometimes it's nonsense. Both are useful — the nonsense tells you which dimensions of your idea were load-bearing.
 
-## Attribution
+Run it ten times on the same idea. The expansions won't repeat.
 
-- **Patrick Gunkel** (1937–2017) — MIT futurist; originator of ideonomy.
-- **Grace Kind** ([gracekind.net](https://gracekind.net)) — synthesized Gunkel's framework in three essays: [Introduction to Ideonomy](https://gracekind.net/writing/ideonomy/intro), [Properties and Dimensions](https://gracekind.net/writing/ideonomy/propertiesanddimensions), [Negation](https://gracekind.net/writing/ideonomy/negation). All operators, organons, and worked examples in this skill trace to her essays. The catalog of dimension-prompts and recipes here is original to this skill but follows the method Grace describes.
+---
 
-If you build on this, please credit Grace and link back to her writing.
+## The bargain
+
+```bash
+git clone git@github.com:latentwill/ideonomy-skill.git ~/Code/ideonomy-skill
+ln -s ~/Code/ideonomy-skill ~/.claude/skills/ideonomy
+```
+
+That's the whole install. Skill is now invokable as `Skill ideonomy` from any Claude Code session. Pure bash + standard tools (`awk`, `sort`, `find`, `curl` only for the optional `--random-org` flag).
+
+---
+
+## What's inside
+
+| Path | Count | Role |
+|---|---|---|
+| `methods/operators/` | 8 | The ideonomic operations: negate, substitute, combine, organon-construct, identify-dimensions, find-trees, abstraction-lift, cross-domain-reinstantiate |
+| `methods/organons/` | 17 | Structured-artifact types — list, chart, graph, atlas, scale, dictionary, tree, plus matrix, cycle, spectrum, timeline, lattice, map, notation, procedure, state-machine, periodic-grid |
+| `methods/dimension-prompts/` | 29 | Question templates that surface an idea's axes — longevity, polarity, autonomy, naturalness, reversibility, … |
+| `methods/recipes/` | 8 | Pre-composed workflows — negation-cascade, cross-domain-lift, organon-sandwich, dimensional-exhaustion, tree-walk, atlas-of-perspectives, … |
+| `bin/pick` | 1 | The chooser. ~10M+ distinct tuples in default mode. |
+
+`bin/pick` flags (intentionally few): `--more` (bigger tuple), `--less` (smaller), `--print` (skip the bodies), `--random-org` (true randomness via random.org's HTTP API), `--seed N` (deterministic, for testing).
+
+---
+
+## Silent self-improvement
+
+Two things happen automatically. No flags. The user doesn't see them.
+
+1. **Mtime memory.** Every picked file gets `touch`ed at the end of the run. The picker weights against recently-touched files on a one-hour half-life, so within a single session the catalog *rotates* — methods you used five minutes ago are much less likely to come up again. The filesystem is the memory; no log file, no state directory.
+2. **Promotion.** When a tuple produces a notably useful expansion, the agent may write a short markdown summary to `methods/recipes/learned/`. The next pick will include it as a candidate recipe. Over time the catalog grows new vocabulary tuned to your work — without anyone curating it.
+
+Together: the skill *rotates its attention* and *grows new methods*. Two forms of animacy. No knobs.
+
+---
+
+## The lineage
+
+**Patrick Gunkel** (1937–2017) — MIT futurist, originator of *ideonomy*: the science of ideas. He spent decades producing thousands of pages of monographs, lists, charts, and divisions cataloguing the structural anatomy of human thought. His original site lives at:
+
+→ **[ideonomy.mit.edu](https://ideonomy.mit.edu)**
+
+The PDFs there are wild. Mendeleev-table-grade wild. Gunkel was working at a level of generality most people never visit, and the scanned monographs (Orange, Bright Green, Blue, Pastel Green, Yellow) are dense beyond reading. They are also the source. Browse them, get lost, come back changed.
+
+**Grace Kind** ([gracekind.net](https://gracekind.net)) — independent writer and researcher whose three essays translate Gunkel into something a present-day reader can actually use:
+
+- [Introduction to Ideonomy](https://gracekind.net/writing/ideonomy/intro)
+- [Properties and Dimensions](https://gracekind.net/writing/ideonomy/propertiesanddimensions)
+- [Negation](https://gracekind.net/writing/ideonomy/negation)
+
+This skill is built directly on her synthesis. Every operator, every organon she explicitly names, every worked example here traces to her writing. The dimension-prompts and recipes are original to this skill but follow the method she describes. **If you build on this, credit Grace and link her work.**
+
+---
+
+## Why this exists
+
+LLMs are powerful brainstormers, but left to their own devices they produce variations of the same handful of moves: list-the-obvious, scale-it-up, add-a-feature, remove-a-feature, give-it-an-app. The space they actually explore is small, and after a few invocations the user can predict the next response.
+
+Ideonomy is a different shape: identify the *dimensions* of an idea, then operate on them. The space of *all the ideas adjacent to this one* is enormous and weird. The picker forces the model into corners of that space it would not otherwise visit. The corner you get sent to this run is not the corner you got sent to last run, because the picker doesn't repeat.
+
+The result, when it works, is the model producing variants you couldn't have produced — not because the model is smarter, but because it was forced into an angle of approach you wouldn't have asked for.
+
+---
 
 ## License
 
-The code (`bin/pick`) is MIT.
+Code (`bin/pick`): MIT.
 
-The prose in `methods/` and `SKILL.md` adapts and extends Grace Kind's published essays. It is shared under [Creative Commons Attribution 4.0 (CC-BY-4.0)](https://creativecommons.org/licenses/by/4.0/) — reuse with attribution to Grace Kind and Patrick Gunkel.
+Prose (`SKILL.md`, `README.md`, `methods/**.md`, `examples/`): Creative Commons Attribution 4.0. Reuse, remix, redistribute — with credit to Grace Kind and Patrick Gunkel.
+
+---
+
+<sub>*fnord*</sub>

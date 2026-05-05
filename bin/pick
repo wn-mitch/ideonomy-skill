@@ -7,15 +7,19 @@
 #   bin/pick --less             # smaller: 1 operator, 1 organon, 2 dim-prompts, 0 recipes
 #   bin/pick --print            # only print the picks; don't cat the bodies
 #   bin/pick --random-org       # seed the picker from random.org (network)
-#   bin/pick --seed N           # deterministic pick for a given integer seed
+#   bin/pick --seed N           # deterministic pick for a given seed (no mtime side-effects)
 #
-# Output: prints the picks (named) followed by the bodies of each picked file,
-# so the calling agent can read the whole thing in one shot.
+# Silent behavior (no flags): each picked file is `touch`ed at the end. The
+# picker weights against recently-touched files (1-hour half-life), so the
+# catalog rotates naturally within a session — a method picked five minutes
+# ago is much less likely to be picked again. --seed mode skips the touch
+# so reproducibility is preserved.
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 METHODS="$ROOT/methods"
+HALF_LIFE=3600   # 1 hour, in seconds
 
 OPS_N=2
 ORG_N=1
@@ -33,7 +37,7 @@ while [[ $# -gt 0 ]]; do
     --more)        OPS_N=3; ORG_N=2; DIM_N=5; REC_CHANCE=100; shift ;;
     --less)        OPS_N=1; ORG_N=1; DIM_N=2; REC_CHANCE=0;   shift ;;
     -h|--help)
-      sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'
+      sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
       ;;
     *)
@@ -60,23 +64,67 @@ else
   RANDOM=$(( $(date +%s) ^ $$ ))
 fi
 
-# pick_n DIR N SEED → echo N random files (one per line)
+# Detect stat flavor (BSD/macOS vs GNU/Linux).
+if stat -f %m / >/dev/null 2>&1; then
+  STAT_MTIME=( -f %m )
+else
+  STAT_MTIME=( -c %Y )
+fi
+NOW=$(date +%s)
+
+# pick_n DIR N SEED — echo N files (one per line), weighted against recency.
+# Searches recursively under DIR (so methods/recipes/learned/ is included
+# when learned recipes accumulate). Skips README.md and files starting "_".
+# Under --seed, weighting is disabled so picks stay reproducible.
 pick_n() {
   local dir="$1" n="$2" seed="$3"
   if [[ ! -d "$dir" ]]; then return; fi
-  ls "$dir"/*.md 2>/dev/null | awk -v seed="$seed" '
-    BEGIN { srand(seed) }
-    { print rand() "\t" $0 }
-  ' | sort -k1,1n | head -"$n" | cut -f2-
+  local weight_enabled=1
+  [[ -n "$SEED" ]] && weight_enabled=0
+  find "$dir" -type f -name '*.md' ! -name 'README.md' ! -name '_*' 2>/dev/null \
+    | sort \
+    | while read -r f; do
+        m=$(stat "${STAT_MTIME[@]}" "$f" 2>/dev/null || echo 0)
+        printf '%s\t%s\n' "$m" "$f"
+      done \
+    | awk -v seed="$seed" -v now="$NOW" -v half="$HALF_LIFE" -v weighted="$weight_enabled" '
+        BEGIN { srand(seed) }
+        {
+          mtime = $1
+          file  = $2
+          if (weighted) {
+            age   = now - mtime
+            if (age < 0) age = 0
+            penalty = exp(-age / half)   # ~1 just-touched, ~0 long-cold
+            score   = rand() + penalty   # bigger = less likely to be picked
+          } else {
+            score = rand()               # pure rand under --seed
+          }
+          print score "\t" file
+        }
+      ' \
+    | sort -k1,1n \
+    | head -"$n" \
+    | cut -f2-
 }
 
-OPS=$(pick_n "$METHODS/operators"          "$OPS_N" "$RANDOM")
-ORGS=$(pick_n "$METHODS/organons"          "$ORG_N" "$RANDOM")
-DIMS=$(pick_n "$METHODS/dimension-prompts" "$DIM_N" "$RANDOM")
+# Pre-evaluate $RANDOM in the parent shell. In bash 3.2, $RANDOM inside a
+# command substitution's args is evaluated in the *subshell's* RNG, which has
+# its own (non-deterministic) seed — so reproducibility under --seed only
+# works if we capture the seeds here first.
+SEED_OPS=$RANDOM
+SEED_ORGS=$RANDOM
+SEED_DIMS=$RANDOM
+SEED_REC_COIN=$RANDOM
+SEED_RECS=$RANDOM
+
+OPS=$(pick_n  "$METHODS/operators"          "$OPS_N" "$SEED_OPS")
+ORGS=$(pick_n "$METHODS/organons"           "$ORG_N" "$SEED_ORGS")
+DIMS=$(pick_n "$METHODS/dimension-prompts"  "$DIM_N" "$SEED_DIMS")
 
 RECS=""
-if (( RANDOM % 100 < REC_CHANCE )); then
-  RECS=$(pick_n "$METHODS/recipes" 1 "$RANDOM")
+if (( SEED_REC_COIN % 100 < REC_CHANCE )); then
+  RECS=$(pick_n "$METHODS/recipes" 1 "$SEED_RECS")
 fi
 
 # --- Header ---
@@ -101,22 +149,28 @@ print_block "RECIPE"            "$RECS"
 
 printf '==============================================\n'
 
-if (( PRINT_ONLY )); then
-  exit 0
+# --- Bodies ---
+if (( ! PRINT_ONLY )); then
+  cat_files() {
+    local files="$1"
+    [[ -z "$files" ]] && return
+    while IFS= read -r f; do
+      [[ -z "$f" ]] && continue
+      printf '\n----- %s -----\n' "$f"
+      cat "$f"
+    done <<< "$files"
+  }
+
+  cat_files "$OPS"
+  cat_files "$ORGS"
+  cat_files "$DIMS"
+  cat_files "$RECS"
 fi
 
-# --- Bodies ---
-cat_files() {
-  local files="$1"
-  [[ -z "$files" ]] && return
-  while IFS= read -r f; do
-    [[ -z "$f" ]] && continue
-    printf '\n----- %s -----\n' "$f"
-    cat "$f"
-  done <<< "$files"
-}
-
-cat_files "$OPS"
-cat_files "$ORGS"
-cat_files "$DIMS"
-cat_files "$RECS"
+# --- mtime memory: touch the picked files so they cool off in future picks.
+# Skipped under --seed for reproducible picks during testing/demo.
+if [[ -z "$SEED" ]]; then
+  for f in $OPS $ORGS $DIMS $RECS; do
+    [[ -n "$f" ]] && touch -- "$f" 2>/dev/null || true
+  done
+fi

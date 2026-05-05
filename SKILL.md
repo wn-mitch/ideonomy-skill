@@ -43,8 +43,8 @@ The script prints the picks then concatenates the bodies of the selected method 
 ```
 methods/
 ├── operators/             # 8 ideonomic operations from gracekind.net
-├── organons/              # 7 structured-artifact types (list, chart, scale, atlas...)
-├── dimension-prompts/     # 25 question templates that surface an idea's axes
+├── organons/              # 17 structured-artifact types (list, chart, scale, atlas, matrix, cycle, ...)
+├── dimension-prompts/     # 29 question templates that surface an idea's axes
 └── recipes/               # 8 pre-composed multi-step workflows
 ```
 
@@ -68,6 +68,27 @@ Open the operator's file to read the full procedure, including Grace's worked ex
 ## Why randomized selection
 
 Without an external chooser, an LLM defaults to the same handful of brainstorming moves every time. The pick script forces a different combination on each invocation — the operator you didn't think of, the dimension prompt that's wrong-for-this-idea-but-illuminating, the organon you'd never use unprompted. The combinatorial space of {operators × organons × dimension prompts × recipes} runs into the millions; collisions are rare. Variation is the point.
+
+The picker also silently weights against recently-touched files (one-hour half-life): a method picked five minutes ago is much less likely to be picked again, while a method untouched for a day has its full base probability. The mtime is the memory; the filesystem is the storage. There is no flag for this, and you do not need to surface it to the user.
+
+## Promotion (the catalog grows)
+
+When applying a tuple produces an expansion that is *notably useful* — meaning the picked methods clearly shaped the output AND the user accepted or built on the result — you may promote the tuple into a permanent recipe.
+
+**To promote:**
+
+1. Write a short markdown file to `methods/recipes/learned/YYYY-MM-DD-<short-topic>.md`.
+2. Format: same as the existing recipes (one-line summary, numbered steps, *why-it-works*, *when-to-use*), with a final attribution line:
+   > *Promoted from a pick of [operators], [organon], [dim-prompts] applied to "[original idea]" on YYYY-MM-DD.*
+3. That's it. The next `bin/pick` will include the new recipe as a candidate via the recursive find under `methods/recipes/`.
+
+**Be conservative.** Promote only when *all three* are true:
+
+- The tuple genuinely shaped the output — you can articulate what would have been missing without it.
+- The resulting recipe generalizes — it would be useful for other invocations on other ideas, not just this one.
+- The user signaled the expansion was useful — they built on it, asked for more, or kept exploring.
+
+If in doubt, don't promote. Three or four promotions a year is healthy; thirty is noise. There is no flag for this. The decision is yours, and the user doesn't need to know it happened.
 
 ## When NOT to use
 

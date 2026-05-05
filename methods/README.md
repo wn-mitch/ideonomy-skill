@@ -17,15 +17,28 @@ The eight ideonomic operations, all traceable to Grace Kind's essays.
 
 ## Organons (`organons/`)
 
-The structured artifacts Grace names in her intro, plus tree (which she identifies as a fundamental ideonomic pattern).
+The structured artifacts Grace names in her intro, tree (which she identifies as a fundamental ideonomic pattern), plus 10 distinct structural shapes added later.
 
+**Grace-named:**
 - **list** — ordered or unordered enumeration
-- **chart** — 2D grid where rows and columns are dimensions
+- **chart** — 2D grid where rows and columns are dimensions, cells contain instances
 - **graph** — nodes and edges
 - **atlas** — bound collection of maps over the same territory at different scales/themes
 - **scale** — ordered axis with marked positions
 - **dictionary** — term-and-definition pairs
 - **tree** — branching hierarchy
+
+**Added (each structurally distinct from the above):**
+- **matrix** — 2D grid where cells contain *relations* / *evaluations*, not instances (Pugh, decision, confusion)
+- **cycle** — closed scale where endpoints connect (calendar, OODA, life cycle)
+- **spectrum** — continuous axis with no canonical marked points
+- **timeline** — anisotropic axis (past fixed, future open); direction is load-bearing
+- **lattice** — partial-order; some pairs comparable, others not (subset, type hierarchies)
+- **map** — 2D spatial layout where *position itself* carries information (subway, mind, concept)
+- **notation** — the syntax IS the organon (music, chemistry, dance, regex)
+- **procedure** — ordered sequence where order is load-bearing (recipe, algorithm, ritual)
+- **state-machine** — nodes are states; edges are conditional transitions
+- **periodic-grid** — saturated chart where empty cells are *predictions*, not gaps
 
 ## Dimension-prompts (`dimension-prompts/`)
 
