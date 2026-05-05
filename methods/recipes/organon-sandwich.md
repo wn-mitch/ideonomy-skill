@@ -1,4 +1,5 @@
 # Recipe: organon sandwich
+<!-- uses: organon-construction, combination -->
 
 Construct → combine → re-construct. The recipe builds an organon, combines it (cross-product) to populate composites, and then *captures the most generative composites in a new organon*. The final organon is richer than either of the two input organons would be alone.
 

@@ -1,4 +1,5 @@
 # Recipe: tree walk
+<!-- uses: tree-finding -->
 
 Walk the dendritic structure in all four directions; each direction yields a different kind of expansion.
 

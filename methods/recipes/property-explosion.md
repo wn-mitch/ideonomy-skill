@@ -1,4 +1,5 @@
 # Recipe: property explosion
+<!-- uses: dimension-identification, negation, substitution, abstraction-lift, tree-finding -->
 
 A maximalist exhaustion-style recipe. Enumerate as many properties of the idea as possible; pick three; apply every operator to each.
 

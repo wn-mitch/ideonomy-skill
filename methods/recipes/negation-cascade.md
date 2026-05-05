@@ -1,4 +1,5 @@
 # Recipe: negation cascade
+<!-- uses: negation, substitution -->
 
 A two-stage operator chain that goes from one idea to a richly populated 2nd-order opposite-space.
 

@@ -1,4 +1,5 @@
 # Recipe: cross-domain lift
+<!-- uses: abstraction-lift, cross-domain-reinstantiation -->
 
 Three operators chained to produce candidate solutions / variants / framings drawn from many fields.
 

@@ -29,14 +29,23 @@ The script prints the picks then concatenates the bodies of the selected method 
 - `--random-org` — seed the picker from random.org (network) instead of local entropy
 - `--seed N` — deterministic pick for a given integer seed
 
-**Step 2 — apply the tuple to the user's idea.** Each method file describes how to apply that operation. Combine them in order:
+**Step 2 — apply the tuple to the user's idea, in gated phases.** The tuple is the workflow. Each picked element is a *required* phase; the recipe (if picked) is a second-pass *overlay*, never a substitute for Phases A–C. Run them in order and emit one labeled section per element:
 
-1. Use the **dimension-prompts** to identify the dimensions / properties of the idea.
-2. Use the **operators** to act on those dimensions (negate, substitute, combine, abstract, etc.).
-3. Use the **organon** as the form for capturing the resulting expansion (list, chart, scale, atlas, etc.).
-4. If a **recipe** was picked, follow its multi-step sequence — recipes orchestrate operators into named workflows.
+- **Phase A — dimensions surfaced.** Apply *each* picked dimension-prompt to the idea. Output a `## Phase A — Dimensions` section listing the axes you found.
+- **Phase B — operators applied.** Apply *each* picked operator to those dimensions. Output one `## Phase B — Operator: <name>` section per operator. If two operators were picked, you must produce two Phase B sections.
+- **Phase C — organon constructed.** Capture the result in the picked organon's form. Output a `## Phase C — Organon: <name>` section. The organon shapes the final artifact, not just a footnote.
+- **Phase D — recipe overlay (only if a recipe was picked).** Apply the recipe as an additional pass over the Phase A–C output, not as a replacement. Output a `## Phase D — Recipe: <name>` section.
 
-**Step 3 — present the expansion.** Hand back the expanded idea-space in the form of the picked organon, with the picked operators visible in how you got there. Don't hide the methods — name them as you apply them.
+**Step 3 — present the expansion.** Hand back the four labeled sections. Every picked element gets its own visibly-named section. If you find yourself only doing the recipe and skipping Phases A–C, you are shortcutting — stop and back up.
+
+### Red flags (you are shortcutting)
+
+- You're producing one flowing answer instead of four labeled phase sections.
+- A picked operator is named in the tuple header but never appears as a Phase B subsection.
+- A recipe was picked and you wrote nothing under Phase A, B, or C — you collapsed the tuple into the recipe.
+- The recipe and a picked operator overlap, and you only applied the recipe — the picker's TUPLE COMPOSITION NOTE will name the *required-extras* you still owe.
+
+The recipe is icing, not bread. Phases A–C are the bread.
 
 ## What's in the catalog
 

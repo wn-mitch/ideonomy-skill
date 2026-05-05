@@ -147,6 +147,66 @@ print_block "ORGANONS"          "$ORGS"
 print_block "DIMENSION-PROMPTS" "$DIMS"
 print_block "RECIPE"            "$RECS"
 
+# --- Overlap callout: when a recipe is picked, parse its `<!-- uses: ... -->`
+# metadata, intersect with the picked operators, and call out which picked
+# operators the recipe already covers vs. which the agent must apply *in
+# addition* to the recipe. The recipe is a second-pass overlay, never a
+# substitute for the picked operators.
+if [[ -n "$RECS" ]]; then
+  recipe_file="$RECS"
+  recipe_name=$(basename "$recipe_file" .md)
+  uses_line=$(grep -E '^<!-- uses:' "$recipe_file" 2>/dev/null | head -1 || true)
+
+  if [[ -n "$uses_line" ]]; then
+    # Strip "<!-- uses:" prefix and "-->" suffix; split on commas.
+    uses_raw=${uses_line#<!-- uses:}
+    uses_raw=${uses_raw%-->}
+    # Normalize: lowercase, trim spaces around items.
+    recipe_ops=()
+    IFS=',' read -ra _ru <<< "$uses_raw"
+    for item in "${_ru[@]}"; do
+      item="${item// /}"
+      [[ -n "$item" ]] && recipe_ops+=("$item")
+    done
+
+    # Picked operator slugs.
+    picked_ops=()
+    while IFS= read -r f; do
+      [[ -z "$f" ]] && continue
+      picked_ops+=("$(basename "$f" .md)")
+    done <<< "$OPS"
+
+    overlap=()
+    extras=()
+    for p in "${picked_ops[@]}"; do
+      hit=0
+      for r in "${recipe_ops[@]}"; do
+        [[ "$p" == "$r" ]] && hit=1 && break
+      done
+      if (( hit )); then overlap+=("$p"); else extras+=("$p"); fi
+    done
+
+    printf '\n'
+    printf '%s\n' '--- TUPLE COMPOSITION NOTE ---'
+    printf 'The recipe `%s` chains: %s\n' "$recipe_name" "${recipe_ops[*]}"
+    if (( ${#overlap[@]} > 0 )); then
+      printf 'Overlap with your picked operators: %s\n' "${overlap[*]}"
+      printf '  → applying the recipe covers these; do not double-count.\n'
+    else
+      printf 'Overlap with your picked operators: (none)\n'
+    fi
+    if (( ${#extras[@]} > 0 )); then
+      printf 'REQUIRED EXTRAS (must be visibly applied IN ADDITION to the recipe): %s\n' "${extras[*]}"
+    else
+      printf 'No required-extras: every picked operator is covered by the recipe.\n'
+      printf '  → you must still apply the dim-prompts and organon as their own phases;\n'
+      printf '    the recipe is a Phase D overlay, not a replacement for Phases A–C.\n'
+    fi
+    printf 'The recipe is a Phase D overlay applied AFTER Phases A (dim-prompts), B (operators), C (organon). Never a substitute.\n'
+    printf '%s\n' '------------------------------'
+  fi
+fi
+
 printf '==============================================\n'
 
 # --- Bodies ---

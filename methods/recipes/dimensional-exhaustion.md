@@ -1,4 +1,5 @@
 # Recipe: dimensional exhaustion
+<!-- uses: dimension-identification, substitution -->
 
 Identify all dimensions of the idea. For each dimension, substitute every reasonable value. Enumerate the entire neighborhood. The exhaustive enumeration *is* the expansion.
 

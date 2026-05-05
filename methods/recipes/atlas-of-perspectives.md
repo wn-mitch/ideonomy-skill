@@ -1,4 +1,5 @@
 # Recipe: atlas of perspectives
+<!-- uses: organon-construction -->
 
 Construct one organon of the idea per perspective. Bind them. The atlas is the multi-perspective view; the cross-perspective comparisons are the payoff.
 

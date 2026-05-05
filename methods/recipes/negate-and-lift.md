@@ -1,4 +1,5 @@
 # Recipe: negate-and-lift
+<!-- uses: negation, abstraction-lift -->
 
 A two-step recipe that uses negation as scaffolding for abstraction. The output isn't the negation itself — it's the *dimension* that distinguishes the original from its negation, surfaced by abstracting both.
 
