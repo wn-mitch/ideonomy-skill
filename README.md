@@ -3,7 +3,7 @@
 > *Ideas are natural phenomena. They have properties. They live along dimensions. They can be sliced, negated, recombined, and re-instantiated like any other natural object.*
 > — after Patrick Gunkel, via Grace Kind
 
-A Claude Code skill that turns any idea into a populated neighborhood of related ideas, by applying combinations of *ideonomic operators* — negate, substitute, combine, abstract, re-instantiate, find-the-tree — drawn from a randomized tuple at every invocation.
+A skill that turns any idea into a populated neighborhood of related ideas, by applying combinations of *ideonomic operators* — negate, substitute, combine, abstract, re-instantiate, find-the-tree — drawn from a randomized tuple at every invocation.
 
 Every call picks a different combination of operators, organons, and dimensional prompts from a catalog of millions of distinct method-tuples. The agent doesn't get to fall back on its default brainstorming moves. That's the whole point.
 
@@ -12,8 +12,8 @@ Every call picks a different combination of operators, organons, and dimensional
 ## Try the rite
 
 ```bash
-$ ~/.claude/skills/ideonomy/bin/pick
-
+$ ~/.hermes/skills/ideonomy/bin/pick
+```
 === IDEONOMY METHOD TUPLE (this invocation) ===
 
 OPERATORS:
@@ -36,7 +36,7 @@ RECIPE:
 […bodies of each picked method file follow, ready for the agent to apply…]
 ```
 
-Then ask Claude to apply the tuple to your idea. What you'll get back: five or ten unfamiliar variants of the idea, organized into the picked organon, with the picked operators visible in how the agent got there. Sometimes the result is brilliant. Sometimes it's nonsense. Both are useful — the nonsense tells you which dimensions of your idea were load-bearing.
+Then ask your agent to apply the tuple to your idea. What you'll get back: five or ten unfamiliar variants of the idea, organized into the picked organon, with the picked operators visible in how the agent got there. Sometimes the result is brilliant. Sometimes it's nonsense. Both are useful — the nonsense tells you which dimensions of your idea were load-bearing.
 
 Run it ten times on the same idea. The expansions won't repeat.
 
@@ -46,10 +46,10 @@ Run it ten times on the same idea. The expansions won't repeat.
 
 ```bash
 git clone git@github.com:latentwill/ideonomy-skill.git ~/Code/ideonomy-skill
-ln -s ~/Code/ideonomy-skill ~/.claude/skills/ideonomy
+ln -s ~/Code/ideonomy-skill ~/.hermes/skills/ideonomy
 ```
 
-That's the whole install. Skill is now invokable as `Skill ideonomy` from any Claude Code session. Pure bash + standard tools (`awk`, `sort`, `find`, `curl` only for the optional `--random-org` flag).
+That's the whole install. Skill is now invokable as `Skill ideonomy` from any session. Pure bash + standard tools (`awk`, `sort`, `find`, `curl` only for the optional `--random-org` flag).
 
 ---
 

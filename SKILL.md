@@ -16,8 +16,8 @@ Ideas have **properties** that vary along **dimensions**. To expand an idea, ide
 **Step 1 — pick a method tuple.** Run the pick script. It selects a random combination of operators, an organon, dimension prompts, and (sometimes) a recipe from the catalog under `methods/`:
 
 ```bash
-"$CLAUDE_PROJECT_DIR"/bin/pick   # if installed in project
-~/.claude/skills/ideonomy/bin/pick   # if installed as personal skill
+"$PROJECT_DIR"/bin/pick   # if installed in project
+~/.hermes/skills/ideonomy/bin/pick   # if installed as personal skill
 ```
 
 The script prints the picks then concatenates the bodies of the selected method files. Read all of it.
