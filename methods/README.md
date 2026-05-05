@@ -1,0 +1,54 @@
+# Method catalog
+
+Browse-only index. The agent doesn't read this — it reads the picks from `bin/pick`. This file exists for humans to scan what's available.
+
+## Operators (`operators/`)
+
+The eight ideonomic operations, all traceable to Grace Kind's essays.
+
+- **negation** — find core/definitional properties, identify each one's opposite, enumerate the opposite-set
+- **substitution** — hold all properties constant except one; swap that property's value
+- **combination** — cross two organons; each pair is a candidate composite idea
+- **organon-construction** — capture the idea as a structured artifact; the structure surfaces gaps
+- **dimension-identification** — name the axes along which versions of this idea can vary
+- **tree-finding** — find parents, children, siblings, and levels of generality (the dendritic structure)
+- **abstraction-lift** — strip domain-specific surface features; expose the structural shape underneath
+- **cross-domain-reinstantiation** — re-instantiate the abstracted form in a different domain
+
+## Organons (`organons/`)
+
+The structured artifacts Grace names in her intro, plus tree (which she identifies as a fundamental ideonomic pattern).
+
+- **list** — ordered or unordered enumeration
+- **chart** — 2D grid where rows and columns are dimensions
+- **graph** — nodes and edges
+- **atlas** — bound collection of maps over the same territory at different scales/themes
+- **scale** — ordered axis with marked positions
+- **dictionary** — term-and-definition pairs
+- **tree** — branching hierarchy
+
+## Dimension-prompts (`dimension-prompts/`)
+
+Question templates that surface an idea's dimensions. Grace describes the method ("identify the axes along which versions of this could vary"); this catalog gives 25 ready-to-pick prompts grouped loosely by family.
+
+**Temporal** — longevity, rate, cyclicity, age, direction
+**Scale & magnitude** — size, cardinality, scope
+**Structure** — homogeneity, hierarchicalness, modularity, connectivity, symmetry
+**Agency & causation** — animacy, autonomy, intentionality
+**Origin** — naturalness, source, discovery-vs-invention
+**Function** — purpose, side-effect, reversibility
+**Embodiment & knowability** — materiality, visibility, predictability
+**Complexity & polarity** — complexity, decomposability, polarity, distribution
+
+## Recipes (`recipes/`)
+
+Pre-composed multi-step workflows that orchestrate operators.
+
+- **negation-cascade** — negate, then substitute on each negation, then enumerate
+- **cross-domain-lift** — abstract, then re-instantiate in N domains, compare
+- **organon-sandwich** — construct, combine, re-construct from generative composites
+- **dimensional-exhaustion** — identify all dimensions, substitute every value, enumerate the neighborhood
+- **tree-walk** — walk up, down, and across the dendritic structure
+- **negate-and-lift** — negate, then abstract both original and opposite; find the discriminating dimension
+- **atlas-of-perspectives** — construct one organon per perspective; compare what each sees
+- **property-explosion** — enumerate 10+ properties, pick 3, apply all operators to each

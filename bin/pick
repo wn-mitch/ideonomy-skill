@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+# pick — randomly select a method tuple from the ideonomy catalog
+#
+# Usage:
+#   bin/pick                    # default: 2 operators, 1 organon, 3 dim-prompts, ~50% recipe
+#   bin/pick --more             # bigger tuple: 3 operators, 2 organons, 5 dim-prompts, 1 recipe
+#   bin/pick --less             # smaller: 1 operator, 1 organon, 2 dim-prompts, 0 recipes
+#   bin/pick --print            # only print the picks; don't cat the bodies
+#   bin/pick --random-org       # seed the picker from random.org (network)
+#   bin/pick --seed N           # deterministic pick for a given integer seed
+#
+# Output: prints the picks (named) followed by the bodies of each picked file,
+# so the calling agent can read the whole thing in one shot.
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+METHODS="$ROOT/methods"
+
+OPS_N=2
+ORG_N=1
+DIM_N=3
+REC_CHANCE=50    # percent chance to include a recipe in default mode
+PRINT_ONLY=0
+SEED=""
+SOURCE="local"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --print)       PRINT_ONLY=1; shift ;;
+    --random-org)  SOURCE="random.org"; shift ;;
+    --seed)        SEED="${2:-}"; shift 2 ;;
+    --more)        OPS_N=3; ORG_N=2; DIM_N=5; REC_CHANCE=100; shift ;;
+    --less)        OPS_N=1; ORG_N=1; DIM_N=2; REC_CHANCE=0;   shift ;;
+    -h|--help)
+      sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'
+      exit 0
+      ;;
+    *)
+      echo "Unknown arg: $1" >&2
+      exit 2
+      ;;
+  esac
+done
+
+# Seed the bash RNG.
+if [[ -n "$SEED" ]]; then
+  RANDOM=$SEED
+elif [[ "$SOURCE" == "random.org" ]]; then
+  ENTROPY=$(curl -fsS --max-time 5 \
+    "https://www.random.org/integers/?num=1&min=0&max=32767&col=1&base=10&format=plain&rnd=new" \
+    2>/dev/null || true)
+  if [[ -n "${ENTROPY:-}" && "$ENTROPY" =~ ^[0-9]+$ ]]; then
+    RANDOM=$ENTROPY
+  else
+    echo "warning: random.org request failed, falling back to local entropy" >&2
+    RANDOM=$(( $(date +%s) ^ $$ ))
+  fi
+else
+  RANDOM=$(( $(date +%s) ^ $$ ))
+fi
+
+# pick_n DIR N SEED → echo N random files (one per line)
+pick_n() {
+  local dir="$1" n="$2" seed="$3"
+  if [[ ! -d "$dir" ]]; then return; fi
+  ls "$dir"/*.md 2>/dev/null | awk -v seed="$seed" '
+    BEGIN { srand(seed) }
+    { print rand() "\t" $0 }
+  ' | sort -k1,1n | head -"$n" | cut -f2-
+}
+
+OPS=$(pick_n "$METHODS/operators"          "$OPS_N" "$RANDOM")
+ORGS=$(pick_n "$METHODS/organons"          "$ORG_N" "$RANDOM")
+DIMS=$(pick_n "$METHODS/dimension-prompts" "$DIM_N" "$RANDOM")
+
+RECS=""
+if (( RANDOM % 100 < REC_CHANCE )); then
+  RECS=$(pick_n "$METHODS/recipes" 1 "$RANDOM")
+fi
+
+# --- Header ---
+printf '=== IDEONOMY METHOD TUPLE (this invocation) ===\n\n'
+
+print_block() {
+  local label="$1" files="$2"
+  [[ -z "$files" ]] && return
+  printf '%s:\n' "$label"
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    name=$(basename "$f" .md)
+    printf '  - %s\n' "$name"
+  done <<< "$files"
+  printf '\n'
+}
+
+print_block "OPERATORS"         "$OPS"
+print_block "ORGANONS"          "$ORGS"
+print_block "DIMENSION-PROMPTS" "$DIMS"
+print_block "RECIPE"            "$RECS"
+
+printf '==============================================\n'
+
+if (( PRINT_ONLY )); then
+  exit 0
+fi
+
+# --- Bodies ---
+cat_files() {
+  local files="$1"
+  [[ -z "$files" ]] && return
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    printf '\n----- %s -----\n' "$f"
+    cat "$f"
+  done <<< "$files"
+}
+
+cat_files "$OPS"
+cat_files "$ORGS"
+cat_files "$DIMS"
+cat_files "$RECS"
