@@ -1,18 +1,29 @@
-# ideonomy
+# ideonomy — plain & rich
 
 > *Ideas are natural phenomena. They have properties. They live along dimensions. They can be sliced, negated, recombined, and re-instantiated like any other natural object.*
 > — after Patrick Gunkel, via Grace Kind
 
-A skill that turns any idea into a populated neighborhood of related ideas, by applying combinations of *ideonomic operators* — negate, substitute, combine, abstract, re-instantiate, find-the-tree — drawn from a randomized tuple at every invocation.
+A pair of skills that turn any idea into a populated neighborhood of related ideas, by applying combinations of *ideonomic operators* — negate, substitute, combine, abstract, re-instantiate, find-the-tree — drawn from a randomized tuple at every invocation.
 
 Every call picks a different combination of operators, organons, and dimensional prompts from a catalog of millions of distinct method-tuples. The agent doesn't get to fall back on its default brainstorming moves. That's the whole point.
+
+The two skills share one brain (operators × organons × dimension-prompts × picker × cooldown) and differ only in how they render the artifact:
+
+| Skill | Rendering | Best channel |
+|---|---|---|
+| **`ideonomy-plain`** | Plain Markdown lists, fenced-code-block tables, no Unicode box-drawing. | Anywhere — including SMS bridges, Telegram, plain Slack DMs, and any context where Unicode might mangle. |
+| **`ideonomy-rich`** | Performative ASCII art: figlet banners, Unicode box-drawing, density gradients, visible ideonomy-machinery layers (tuple legend, dimensions surfaced, operator-named dividers, ideonomy trail). | Terminals, READMEs, blog posts with monospace code blocks, fixed-width-font emails, ttyrec sessions. |
+
+Default to `ideonomy-plain`. Use `ideonomy-rich` when you know the medium can hold the art.
 
 ---
 
 ## Try the rite
 
 ```bash
-$ ~/.hermes/skills/ideonomy/bin/pick
+$ ~/.claude/skills/ideonomy-plain/bin/pick    # or ideonomy-rich; same picker
+```
+
 ```
 === IDEONOMY METHOD TUPLE (this invocation) ===
 
@@ -27,9 +38,6 @@ DIMENSION-PROMPTS:
   - longevity
   - autonomy
   - reversibility
-
-RECIPE:
-  - cross-domain-lift
 
 ==============================================
 
@@ -46,22 +54,40 @@ Run it ten times on the same idea. The expansions won't repeat.
 
 ```bash
 git clone git@github.com:latentwill/ideonomy-skill.git ~/Code/ideonomy-skill
-ln -s ~/Code/ideonomy-skill ~/.hermes/skills/ideonomy
+ln -s ~/Code/ideonomy-skill/ideonomy-plain  ~/.claude/skills/ideonomy-plain
+ln -s ~/Code/ideonomy-skill/ideonomy-rich   ~/.claude/skills/ideonomy-rich
 ```
 
-That's the whole install. Skill is now invokable as `Skill ideonomy` from any session. Pure bash + standard tools (`awk`, `sort`, `find`, `curl` only for the optional `--random-org` flag).
+That's the whole install. Both skills now invokable as `Skill ideonomy-plain` or `Skill ideonomy-rich` from any session. Pure bash + standard tools (`awk`, `sort`, `find`, `curl` only for the optional `--random-org` flag); `ideonomy-rich` additionally benefits from `figlet` / `boxes` / `toilet` if installed (`brew install figlet boxes toilet`), but always falls back to the public `asciified.thelicato.io` API.
 
 ---
 
 ## What's inside
 
+```
+ideonomy-skill/
+├── ideonomy-plain/        ← portable rendering (default)
+│   ├── SKILL.md
+│   ├── bin/pick           ← the chooser
+│   ├── methods/           ← operators, organons, dimension-prompts
+│   └── examples/
+└── ideonomy-rich/         ← monospace-rich rendering
+    ├── SKILL.md
+    ├── bin/pick           ← thin wrapper → ../ideonomy-plain/bin/pick
+    └── rendering/         ← per-organon ASCII recipes
+                              (chart, tree, list, atlas, scale, cycle, dictionary)
+```
+
+The catalog (single source of truth):
+
 | Path | Count | Role |
 |---|---|---|
-| `methods/operators/` | 8 | The ideonomic operations: negate, substitute, combine, organon-construct, identify-dimensions, find-trees, abstraction-lift, cross-domain-reinstantiate |
-| `methods/organons/` | 17 | Structured-artifact types — list, chart, graph, atlas, scale, dictionary, tree, plus matrix, cycle, spectrum, timeline, lattice, map, notation, procedure, state-machine, periodic-grid |
-| `methods/dimension-prompts/` | 29 | Question templates that surface an idea's axes — longevity, polarity, autonomy, naturalness, reversibility, … |
-| `methods/recipes/` | 8 | Pre-composed workflows — negation-cascade, cross-domain-lift, organon-sandwich, dimensional-exhaustion, tree-walk, atlas-of-perspectives, … |
-| `bin/pick` | 1 | The chooser. ~10M+ distinct tuples in default mode. |
+| `ideonomy-plain/methods/operators/` | 8 | The ideonomic operations: negate, substitute, combine, organon-construct, identify-dimensions, find-trees, abstraction-lift, cross-domain-reinstantiate |
+| `ideonomy-plain/methods/organons/` | 17 | Structured-artifact types — list, chart, graph, atlas, scale, dictionary, tree, plus matrix, cycle, spectrum, timeline, lattice, map, notation, procedure, state-machine, periodic-grid |
+| `ideonomy-plain/methods/dimension-prompts/` | 29 | Question templates that surface an idea's axes — longevity, polarity, autonomy, naturalness, reversibility, … |
+| `ideonomy-plain/bin/pick` | 1 | The chooser. ~1.7M distinct tuples in default mode; ~900M in `--more`. |
+
+There is deliberately no `recipes/` directory — no saved-combinations layer. Combinations are what the picker produces by drawing operators × organons × dimension-prompts; freezing past combinations into named recipes pulls the picker toward defaults and works against the random-selection mechanism that makes the skill useful in the first place. A handful of historical recipe sketches survive under `ideonomy-plain/examples/historical-recipes/` for browsing only; they are not part of the active catalog.
 
 `bin/pick` flags (intentionally few): `--more` (bigger tuple), `--less` (smaller), `--print` (skip the bodies), `--random-org` (true randomness via random.org's HTTP API), `--seed N` (deterministic, for testing).
 
@@ -69,12 +95,9 @@ That's the whole install. Skill is now invokable as `Skill ideonomy` from any se
 
 ## Silent self-improvement
 
-Two things happen automatically. No flags. The user doesn't see them.
+**Mtime memory.** Every picked file gets `touch`ed at the end of the run. The picker weights against recently-touched files on a one-hour half-life, so within a single session the catalog *rotates* — methods you used five minutes ago are much less likely to come up again. The filesystem is the memory; no log file, no state directory.
 
-1. **Mtime memory.** Every picked file gets `touch`ed at the end of the run. The picker weights against recently-touched files on a one-hour half-life, so within a single session the catalog *rotates* — methods you used five minutes ago are much less likely to come up again. The filesystem is the memory; no log file, no state directory.
-2. **Promotion.** When a tuple produces a notably useful expansion, the agent may write a short markdown summary to `methods/recipes/learned/`. The next pick will include it as a candidate recipe. Over time the catalog grows new vocabulary tuned to your work — without anyone curating it.
-
-Together: the skill *rotates its attention* and *grows new methods*. Two forms of animacy. No knobs.
+When a tuple produces a notably useful expansion, the agent may grow the catalog by promoting *down* into primitives — a new operator, organon, or dimension-prompt. Never up into a saved-combinations layer; that's the trap that re-introduces defaults.
 
 ---
 

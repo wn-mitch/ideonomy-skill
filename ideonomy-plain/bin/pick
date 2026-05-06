@@ -2,9 +2,9 @@
 # pick — randomly select a method tuple from the ideonomy catalog
 #
 # Usage:
-#   bin/pick                    # default: 2 operators, 1 organon, 3 dim-prompts, ~50% recipe
-#   bin/pick --more             # bigger tuple: 3 operators, 2 organons, 5 dim-prompts, 1 recipe
-#   bin/pick --less             # smaller: 1 operator, 1 organon, 2 dim-prompts, 0 recipes
+#   bin/pick                    # default: 2 operators, 1 organon, 3 dim-prompts
+#   bin/pick --more             # bigger tuple: 3 operators, 2 organons, 5 dim-prompts
+#   bin/pick --less             # smaller: 1 operator, 1 organon, 2 dim-prompts
 #   bin/pick --print            # only print the picks; don't cat the bodies
 #   bin/pick --random-org       # seed the picker from random.org (network)
 #   bin/pick --seed N           # deterministic pick for a given seed (no mtime side-effects)
@@ -24,7 +24,6 @@ HALF_LIFE=3600   # 1 hour, in seconds
 OPS_N=2
 ORG_N=1
 DIM_N=3
-REC_CHANCE=50    # percent chance to include a recipe in default mode
 PRINT_ONLY=0
 SEED=""
 SOURCE="local"
@@ -34,8 +33,8 @@ while [[ $# -gt 0 ]]; do
     --print)       PRINT_ONLY=1; shift ;;
     --random-org)  SOURCE="random.org"; shift ;;
     --seed)        SEED="${2:-}"; shift 2 ;;
-    --more)        OPS_N=3; ORG_N=2; DIM_N=5; REC_CHANCE=100; shift ;;
-    --less)        OPS_N=1; ORG_N=1; DIM_N=2; REC_CHANCE=0;   shift ;;
+    --more)        OPS_N=3; ORG_N=2; DIM_N=5; shift ;;
+    --less)        OPS_N=1; ORG_N=1; DIM_N=2; shift ;;
     -h|--help)
       sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
@@ -73,8 +72,7 @@ fi
 NOW=$(date +%s)
 
 # pick_n DIR N SEED — echo N files (one per line), weighted against recency.
-# Searches recursively under DIR (so methods/recipes/learned/ is included
-# when learned recipes accumulate). Skips README.md and files starting "_".
+# Searches recursively under DIR. Skips README.md and files starting "_".
 # Under --seed, weighting is disabled so picks stay reproducible.
 pick_n() {
   local dir="$1" n="$2" seed="$3"
@@ -115,17 +113,10 @@ pick_n() {
 SEED_OPS=$RANDOM
 SEED_ORGS=$RANDOM
 SEED_DIMS=$RANDOM
-SEED_REC_COIN=$RANDOM
-SEED_RECS=$RANDOM
 
 OPS=$(pick_n  "$METHODS/operators"          "$OPS_N" "$SEED_OPS")
 ORGS=$(pick_n "$METHODS/organons"           "$ORG_N" "$SEED_ORGS")
 DIMS=$(pick_n "$METHODS/dimension-prompts"  "$DIM_N" "$SEED_DIMS")
-
-RECS=""
-if (( SEED_REC_COIN % 100 < REC_CHANCE )); then
-  RECS=$(pick_n "$METHODS/recipes" 1 "$SEED_RECS")
-fi
 
 # --- Header ---
 printf '=== IDEONOMY METHOD TUPLE (this invocation) ===\n\n'
@@ -145,67 +136,6 @@ print_block() {
 print_block "OPERATORS"         "$OPS"
 print_block "ORGANONS"          "$ORGS"
 print_block "DIMENSION-PROMPTS" "$DIMS"
-print_block "RECIPE"            "$RECS"
-
-# --- Overlap callout: when a recipe is picked, parse its `<!-- uses: ... -->`
-# metadata, intersect with the picked operators, and call out which picked
-# operators the recipe already covers vs. which the agent must apply *in
-# addition* to the recipe. The recipe is a second-pass overlay, never a
-# substitute for the picked operators.
-if [[ -n "$RECS" ]]; then
-  recipe_file="$RECS"
-  recipe_name=$(basename "$recipe_file" .md)
-  uses_line=$(grep -E '^<!-- uses:' "$recipe_file" 2>/dev/null | head -1 || true)
-
-  if [[ -n "$uses_line" ]]; then
-    # Strip "<!-- uses:" prefix and "-->" suffix; split on commas.
-    uses_raw=${uses_line#<!-- uses:}
-    uses_raw=${uses_raw%-->}
-    # Normalize: lowercase, trim spaces around items.
-    recipe_ops=()
-    IFS=',' read -ra _ru <<< "$uses_raw"
-    for item in "${_ru[@]}"; do
-      item="${item// /}"
-      [[ -n "$item" ]] && recipe_ops+=("$item")
-    done
-
-    # Picked operator slugs.
-    picked_ops=()
-    while IFS= read -r f; do
-      [[ -z "$f" ]] && continue
-      picked_ops+=("$(basename "$f" .md)")
-    done <<< "$OPS"
-
-    overlap=()
-    extras=()
-    for p in "${picked_ops[@]}"; do
-      hit=0
-      for r in "${recipe_ops[@]}"; do
-        [[ "$p" == "$r" ]] && hit=1 && break
-      done
-      if (( hit )); then overlap+=("$p"); else extras+=("$p"); fi
-    done
-
-    printf '\n'
-    printf '%s\n' '--- TUPLE COMPOSITION NOTE ---'
-    printf 'The recipe `%s` chains: %s\n' "$recipe_name" "${recipe_ops[*]}"
-    if (( ${#overlap[@]} > 0 )); then
-      printf 'Overlap with your picked operators: %s\n' "${overlap[*]}"
-      printf '  → applying the recipe covers these; do not double-count.\n'
-    else
-      printf 'Overlap with your picked operators: (none)\n'
-    fi
-    if (( ${#extras[@]} > 0 )); then
-      printf 'REQUIRED EXTRAS (must be visibly applied IN ADDITION to the recipe): %s\n' "${extras[*]}"
-    else
-      printf 'No required-extras: every picked operator is covered by the recipe.\n'
-      printf '  → you must still apply the dim-prompts and organon as their own phases;\n'
-      printf '    the recipe is a Phase D overlay, not a replacement for Phases A–C.\n'
-    fi
-    printf 'The recipe is a Phase D overlay applied AFTER Phases A (dim-prompts), B (operators), C (organon). Never a substitute.\n'
-    printf '%s\n' '------------------------------'
-  fi
-fi
 
 printf '==============================================\n'
 
@@ -224,13 +154,12 @@ if (( ! PRINT_ONLY )); then
   cat_files "$OPS"
   cat_files "$ORGS"
   cat_files "$DIMS"
-  cat_files "$RECS"
 fi
 
 # --- mtime memory: touch the picked files so they cool off in future picks.
 # Skipped under --seed for reproducible picks during testing/demo.
 if [[ -z "$SEED" ]]; then
-  for f in $OPS $ORGS $DIMS $RECS; do
+  for f in $OPS $ORGS $DIMS; do
     [[ -n "$f" ]] && touch -- "$f" 2>/dev/null || true
   done
 fi

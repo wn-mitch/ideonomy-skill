@@ -53,15 +53,6 @@ Question templates that surface an idea's dimensions. Grace describes the method
 **Embodiment & knowability** — materiality, visibility, predictability
 **Complexity & polarity** — complexity, decomposability, polarity, distribution
 
-## Recipes (`recipes/`)
+## A note on recipes
 
-Pre-composed multi-step workflows that orchestrate operators.
-
-- **negation-cascade** — negate, then substitute on each negation, then enumerate
-- **cross-domain-lift** — abstract, then re-instantiate in N domains, compare
-- **organon-sandwich** — construct, combine, re-construct from generative composites
-- **dimensional-exhaustion** — identify all dimensions, substitute every value, enumerate the neighborhood
-- **tree-walk** — walk up, down, and across the dendritic structure
-- **negate-and-lift** — negate, then abstract both original and opposite; find the discriminating dimension
-- **atlas-of-perspectives** — construct one organon per perspective; compare what each sees
-- **property-explosion** — enumerate 10+ properties, pick 3, apply all operators to each
+There is deliberately no `recipes/` directory — no saved-combinations layer. Combinations are what the picker produces by drawing operators × organons × dimension-prompts; freezing past combinations into named recipes pulls the picker toward defaults and works against the random-selection mechanism that makes the skill useful in the first place. Some historical recipe sketches survive under `examples/historical-recipes/` for browsing only; they are not part of the active catalog.

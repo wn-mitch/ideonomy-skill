@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Thin wrapper: ideonomy-rich delegates picking to ideonomy-plain. Same catalog,
+# shared cooldown (mtime memory), single source of truth for primitives.
+exec "$(dirname "$0")/../../ideonomy-plain/bin/pick" "$@"
