@@ -19,7 +19,7 @@ If you're not sure which to pick, default to `ideonomy-plain`. Use this one when
 
 ## Core principle
 
-Same as `ideonomy-plain` — Patrick Gunkel's framework via Grace Kind. Ideas have *properties* varying along *dimensions*; expand by negating, substituting, combining, re-instantiating. Read `~/.claude/skills/ideonomy-plain/SKILL.md` for the conceptual core if you haven't.
+Same as `ideonomy-plain` — Patrick Gunkel's framework via Grace Kind. Ideas have *properties* varying along *dimensions*; expand by negating, substituting, combining, re-instantiating.
 
 The difference is everything below: **render the organon as performative ASCII art**, not as plain bullets. Inspired by mahidalhan's *ascii-art-explainer*: composition teaches, motion shown, density is meaning, drama at the pivot.
 
@@ -28,10 +28,10 @@ The difference is everything below: **render the organon as performative ASCII a
 **Step 1 — pick a method tuple.**
 
 ```bash
-~/.claude/skills/ideonomy-rich/bin/pick
+bin/pick
 ```
 
-(Delegates to `ideonomy-plain`'s picker; same catalog. Picking from one warms cooldown for both, by design.)
+(Same picker, same catalog as `ideonomy-plain`. Each skill carries its own copy so it drops cleanly into any `skills/` folder on its own.)
 
 **Step 2 — work through the tuple in two passes.** Same internal pass as `ideonomy-plain`: dimension-prompts → operators → organon. The external pass is what changes.
 
@@ -210,8 +210,8 @@ Brackets:       ⟦ ⟧ ⟨ ⟩ « » ⌜ ⌝ ⌞ ⌟
 
 ## See also
 
-- `~/.claude/skills/ideonomy-plain/SKILL.md` — sibling, plain-text-portable. Same primitives, different rendering policy.
-- `~/.claude/skills/ideonomy-rich/rendering/` — per-organon recipes.
+- `ideonomy-plain` — sibling skill, plain-text-portable. Same primitives, different rendering policy. Install it alongside this one if you want both available.
+- `rendering/` (within this skill) — per-organon ASCII recipes.
 - Hermes `ascii-art` skill — pyfiglet, cowsay, boxes, image-to-ascii. Install if missing.
 - mahidalhan/claude-hacks `ascii-art-explainer` — performative ASCII philosophy this skill inherits.
 - mahidalhan/claude-hacks `ascii-explainer` — diagnose-then-render approach for diagrams.

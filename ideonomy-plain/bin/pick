@@ -85,7 +85,7 @@ pick_n() {
         m=$(stat "${STAT_MTIME[@]}" "$f" 2>/dev/null || echo 0)
         printf '%s\t%s\n' "$m" "$f"
       done \
-    | awk -v seed="$seed" -v now="$NOW" -v half="$HALF_LIFE" -v weighted="$weight_enabled" '
+    | awk -F'\t' -v seed="$seed" -v now="$NOW" -v half="$HALF_LIFE" -v weighted="$weight_enabled" '
         BEGIN { srand(seed) }
         {
           mtime = $1
@@ -159,7 +159,7 @@ fi
 # --- mtime memory: touch the picked files so they cool off in future picks.
 # Skipped under --seed for reproducible picks during testing/demo.
 if [[ -z "$SEED" ]]; then
-  for f in $OPS $ORGS $DIMS; do
+  printf '%s\n%s\n%s\n' "$OPS" "$ORGS" "$DIMS" | while IFS= read -r f; do
     [[ -n "$f" ]] && touch -- "$f" 2>/dev/null || true
   done
 fi

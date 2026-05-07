@@ -52,13 +52,27 @@ Run it ten times on the same idea. The expansions won't repeat.
 
 ## The bargain
 
+Each skill folder is fully self-contained — drop either or both into any agent's `skills/` directory and they load. No installer, no symlinks, no build step.
+
 ```bash
-git clone git@github.com:latentwill/ideonomy-skill.git ~/Code/ideonomy-skill
-ln -s ~/Code/ideonomy-skill/ideonomy-plain  ~/.claude/skills/ideonomy-plain
-ln -s ~/Code/ideonomy-skill/ideonomy-rich   ~/.claude/skills/ideonomy-rich
+git clone git@github.com:latentwill/ideonomy-skill.git
+cp -R ideonomy-skill/ideonomy-plain  <your-skills-folder>/
+cp -R ideonomy-skill/ideonomy-rich   <your-skills-folder>/   # optional
 ```
 
-That's the whole install. Both skills now invokable as `Skill ideonomy-plain` or `Skill ideonomy-rich` from any session. Pure bash + standard tools (`awk`, `sort`, `find`, `curl` only for the optional `--random-org` flag); `ideonomy-rich` additionally benefits from `figlet` / `boxes` / `toilet` if installed (`brew install figlet boxes toilet`), but always falls back to the public `asciified.thelicato.io` API.
+Common destinations:
+
+| Agent | Skills folder |
+|---|---|
+| Claude Code | `~/.claude/skills/` |
+| Cowork | `~/Library/Application Support/Claude/local-agent-mode-sessions/skills-plugin/<global-uuid>/<workspace-uuid>/skills/` |
+| Anything else with a Claude-style skill loader | wherever it puts `SKILL.md`-based skills |
+
+The agent picks `ideonomy-plain` vs `ideonomy-rich` automatically based on the channel — that's why both skills carry their own description. Default to `ideonomy-plain` if you only want one.
+
+Pure bash + standard tools (`awk`, `sort`, `find`, `curl` only for the optional `--random-org` flag). `ideonomy-rich` additionally benefits from `figlet` / `boxes` / `toilet` if installed (`brew install figlet boxes toilet`), but always falls back to the public `asciified.thelicato.io` API.
+
+> **Maintainer note:** the operator/organon/dimension-prompt catalog and `bin/pick` live in `ideonomy-plain/`. `ideonomy-rich/` carries duplicate copies so it can drop in alone — when you change a method file or the picker, update both folders. (`diff -r ideonomy-plain/methods ideonomy-rich/methods` to check.)
 
 ---
 
