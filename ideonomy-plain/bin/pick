@@ -160,6 +160,6 @@ fi
 # Skipped under --seed for reproducible picks during testing/demo.
 if [[ -z "$SEED" ]]; then
   printf '%s\n%s\n%s\n' "$OPS" "$ORGS" "$DIMS" | while IFS= read -r f; do
-    [[ -n "$f" ]] && touch -- "$f" 2>/dev/null || true
+    [[ -n "$f" ]] && touch "$f" 2>/dev/null || true
   done
 fi
