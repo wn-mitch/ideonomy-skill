@@ -1,4 +1,4 @@
-# ideonomy — plain & rich
+# Ideonomy — a skill for exploring an idea space
 
 > *Ideas are natural phenomena. They have properties. They live along dimensions. They can be sliced, negated, recombined, and re-instantiated like any other natural object.*
 > — after Patrick Gunkel, via Grace Kind
