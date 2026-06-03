@@ -28,7 +28,11 @@ The difference is everything below: **render the organon as performative ASCII a
 **Step 1 — pick a method tuple.**
 
 ```bash
-bin/pick
+# Locate pick (works for any installation method):
+PICK=$(find ~/.claude/plugins ~/.claude/skills -path '*/ideonomy-rich/bin/pick' -type f 2>/dev/null | head -1)
+bash "$PICK"
+
+# With flags: bash "$PICK" --more / --less / --print / --seed N
 ```
 
 (Same picker, same catalog as `ideonomy-plain`. Each skill carries its own copy so it drops cleanly into any `skills/` folder on its own.)

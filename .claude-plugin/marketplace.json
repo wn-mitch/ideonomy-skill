@@ -1,0 +1,24 @@
+{
+  "name": "ideonomy",
+  "owner": {
+    "name": "Ed Kennedy",
+    "url": "https://github.com/latentwill"
+  },
+  "metadata": {
+    "description": "Ideonomy skills for AI agents — systematic idea expansion using Patrick Gunkel's framework, synthesized by Grace Kind",
+    "version": "1.0.0",
+    "repository": "https://github.com/latentwill/ideonomy-skill"
+  },
+  "plugins": [
+    {
+      "name": "ideonomy",
+      "description": "Two complementary idea-expansion skills based on Patrick Gunkel's ideonomy — the science of treating ideas as natural phenomena that can be sliced, negated, recombined, and re-instantiated. ideonomy-plain outputs plain-text-portable artifacts (survives SMS/Telegram/Slack). ideonomy-rich outputs performative ASCII art for monospace terminals.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./ideonomy-plain",
+        "./ideonomy-rich"
+      ]
+    }
+  ]
+}
