@@ -60,6 +60,20 @@ Every picked element must visibly shape the output, but through what it *is*, no
 - **For charts in plaintext-only contexts**, render as a labeled list ("Row × Col → cell") rather than a 2D table.
 - **Reading test:** if the output were pasted into a plain-SMS bridge, would the structure still come through? If not, simplify.
 
+### Grounding against an inspectable subject
+
+Ideonomy invents freely — that is the point. But when the idea you are expanding *is a real, inspectable artifact* — a codebase, a dataset, a document corpus, an existing product — every candidate the operators generate makes an implicit claim about that artifact: *it lacks X, it has no Y, Z is missing*. Those claims are checkable, and an unchecked one is worse than no candidate at all: it is a confident fabrication wearing the costume of an insight.
+
+So before a candidate ships, ground it against the subject:
+
+1. **Name the claim.** What does this candidate assert the subject already does, or doesn't, contain?
+2. **Search the subject for it** — the grep, query, or lookup that would surface an existing instance. Search the artifact, not your memory of it.
+3. **Let the search win.** If the thing already exists, the candidate is not a gap: relabel it (*"refactor of `<path>`"*) or drop it. Only a candidate whose absence you searched for and confirmed may be presented as new.
+
+A candidate presented as a gap should carry the evidence that it is one — the search that came up empty. *"No `X` handler exists (grep → 0 hits)"* is a finding; *"we should add `X`"* with no search behind it is a guess.
+
+This is distinct from the "fact-check the idea" case under **When NOT to use** (validating a claim about the world — that wants a research workflow). Grounding is narrower and always applies when the subject is inspectable: do not tell a corpus what it lacks without reading the corpus.
+
 ### Red flags (you are shortcutting or going off-style)
 
 - The output reads as a process log ("Here's what I did") instead of an artifact ("Here's the chart").
@@ -67,6 +81,7 @@ Every picked element must visibly shape the output, but through what it *is*, no
 - A picked operator was held in your head but never visibly shaped a section of the output.
 - The output uses Unicode box-drawing characters or bare Markdown tables that will break in chat clients.
 - You produced one flowing prose answer with no organon at all — the structured artifact is the entire point.
+- You told the subject what it lacks without searching it — a candidate asserts "there's no X" or "X is missing" and no grep, query, or lookup backs the claim. The expansion is inventing gaps instead of finding them.
 
 The operators-on-dimensions are bread. The organon is the plate the bread is served on.
 

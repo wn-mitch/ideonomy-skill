@@ -189,7 +189,25 @@ Brackets:       ⟦ ⟧ ⟨ ⟩ « » ⌜ ⌝ ⌞ ⌟
 - **No ANSI color in saved-text contexts.** `toilet --gay` looks great in a live terminal, looks like `\e[31m` garbage in a markdown file. Color belongs to live tty only.
 - **Box-drawing styles do not mix within a single diagram.** Pick one of `┌─┐` / `╔═╗` / `╭─╮` and stick with it; mixing `+--+` ASCII with `┌─┐` Unicode is the cardinal sin.
 
+## Grounding against an inspectable subject
+
+Ideonomy invents freely — that is the point. But when the idea you are expanding *is a real, inspectable artifact* — a codebase, a dataset, a document corpus, an existing product — every candidate the operators generate makes an implicit claim about that artifact: *it lacks X, it has no Y, Z is missing*. Those claims are checkable, and an unchecked one is worse than no candidate at all: it is a confident fabrication wearing the costume of an insight.
+
+So before a candidate ships, ground it against the subject:
+
+1. **Name the claim.** What does this candidate assert the subject already does, or doesn't, contain?
+2. **Search the subject for it** — the grep, query, or lookup that would surface an existing instance. Search the artifact, not your memory of it.
+3. **Let the search win.** If the thing already exists, the candidate is not a gap: relabel it (*"refactor of `<path>`"*) or drop it. Only a candidate whose absence you searched for and confirmed may be presented as new.
+
+A candidate presented as a gap should carry the evidence that it is one — the search that came up empty. *"No `X` handler exists (grep → 0 hits)"* is a finding; *"we should add `X`"* with no search behind it is a guess.
+
+This is distinct from the "fact-check the idea" case under **When NOT to use** (validating a claim about the world — that wants a research workflow). Grounding is narrower and always applies when the subject is inspectable: do not tell a corpus what it lacks without reading the corpus.
+
 ## Red flags
+
+**Ungrounded gap-claims (when expanding a real, inspectable subject):**
+
+- A candidate asserts the subject lacks something ("no X", "X is missing") with no search behind it → you are inventing gaps, not finding them. Ground it or drop it (see **Grounding against an inspectable subject**).
 
 **Brainstorming-machinery invisibility (the big one):**
 
